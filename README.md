@@ -17,3 +17,4 @@ createClient() - WIP function for wrapping the libaray in a client
 
 Design Goals:
 - Easily configurable. Set the settings (in-cluster or external promethes, metrics list, etc.) and call ConfigureMetrics() and metrics should come up.
+- use interface/client to wrap around the functions so users don't have to call them directly
