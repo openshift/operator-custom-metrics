@@ -13,17 +13,13 @@ type metricsConfigBuilder struct {
 	config metricsConfig
 }
 
-// convertmetrics is a user-defined function, indicating how the metrics are collected.
-type convertMetrics func()
-
 // NewBuilder sets the default values to the metricsConfig object.
 func NewBuilder() *metricsConfigBuilder {
 	return &metricsConfigBuilder{
 		config: metricsConfig{
-			metricsPath:           defaultMetricsPath,
-			metricsPort:           defaultMetricsPort,
-			collectorList:         nil,
-			recordMetricsFunction: nil,
+			metricsPath:   defaultMetricsPath,
+			metricsPort:   defaultMetricsPort,
+			collectorList: nil,
 		},
 	}
 }
@@ -45,8 +41,8 @@ func (b *metricsConfigBuilder) WithPath(path string) *metricsConfigBuilder {
 	return b
 }
 
-// WithCollectors appends the prometheus-collector provided by the user to a list of Collectors.
-func (b *metricsConfigBuilder) WithCollectors(collector prometheus.Collector) *metricsConfigBuilder {
+// WithCollector appends the prometheus-collector provided by the user to a list of Collectors.
+func (b *metricsConfigBuilder) WithCollector(collector prometheus.Collector) *metricsConfigBuilder {
 	if b.config.collectorList == nil {
 		b.config.collectorList = make([]prometheus.Collector, 0)
 	}
@@ -54,8 +50,8 @@ func (b *metricsConfigBuilder) WithCollectors(collector prometheus.Collector) *m
 	return b
 }
 
-// WithMetricsFunction updates the configuration with the user-defined function to update the metrics.
-func (b *metricsConfigBuilder) WithMetricsFunction(recordMetricsFunction convertMetrics) *metricsConfigBuilder {
-	b.config.recordMetricsFunction = recordMetricsFunction
+// WithCollectors updates the collectorList to the list of collectors provided by the user.
+func (b *metricsConfigBuilder) WithCollectors(collectors []prometheus.Collector) *metricsConfigBuilder {
+	b.config.collectorList = collectors
 	return b
 }

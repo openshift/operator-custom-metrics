@@ -37,6 +37,6 @@ The following functions of the library can be called by the user to create a met
 1. `NewBuilder()` - Sets the parameters of the metricsConfig Object to default values.
 2. `WithPort(port string)` - Updates the default value of port in the metricsConfig object.
 3. `WithPath(path string)` - Updates the default value of path in the metricsConfig object.
-4. `WithCollectors(collector prometheus.Collector)` - Creates a list of prometheus collectors which are to be registered.
-5. `WithMetricsFunction(recordMetricsFunction convertMetrics)` - User defined function which updates the metric parameters given to the library.
+4. `WithCollector(collector prometheus.Collector)` - Creates a list of prometheus collectors which are to be registered.
+5. `WithCollectors([]prometheus.Collector)` - Updates the list of collectors in the metricsConfig object.
 6. `GetConfig()` - Returns the reference to metricsConfig which is built with the configuration set by the user.
