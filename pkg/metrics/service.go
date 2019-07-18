@@ -215,19 +215,26 @@ func createOrUpdateService(ctx context.Context, client client.Client, s *v1.Serv
 
 //createOrUpdateRoute is a function which creates or updates the route for the service object.
 func createOrUpdateRoute(ctx context.Context, client client.Client, r *routev1.Route) (*routev1.Route, error) {
-	err := client.Create(ctx, r)
-	if err != nil {
-		if k8serr.IsAlreadyExists(err) {
-			// update the Route
-			if rUpdateErr := client.Update(ctx, r); rUpdateErr != nil {
-				log.Info("Error creating metrics route", "Error", rUpdateErr.Error())
-				return nil, rUpdateErr
+	if err := client.Create(ctx, r); err != nil {
+		if err != nil {
+			if !k8serr.IsAlreadyExists(err) {
+				return nil, err
 			}
-			log.Info("Metrics route object updated", "Route.Name", r.Name, "Route.Namespace", r.Namespace)
-			return nil, nil
+
+			existingRoute := &routev1.Route{}
+			err := client.Get(ctx, types.NamespacedName{
+				Name:      r.Name,
+				Namespace: r.Namespace,
+			}, existingRoute)
+			// update the Route
+			r.ResourceVersion = existingRoute.ResourceVersion
+			if err = client.Update(ctx, r); err != nil {
+				log.Info("Error creating metrics route", "Error", err.Error())
+				return nil, err
+			}
+			log.Info("Metrics Route object updated Route.Name %v and Route.Namespace %v", r.Name, r.Namespace)
+			return existingRoute, nil
 		}
-		log.Info("Error creating metrics route", "Error", err.Error())
-		return nil, err
 
 	}
 	log.Info("Metrics Route object Created", "Route.Name", r.Name, "Route.Namespace", r.Namespace)
