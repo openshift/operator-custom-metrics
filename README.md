@@ -28,7 +28,7 @@ This is a user-defined function which describes the process in which the custom 
 The library can be integrated by downloading the same, using the following command:
 
 ```bash
-go get github.com/openshift/operator-custom-metrics
+go get -d github.com/openshift/operator-custom-metrics
 ```
 
 ## Using operator-custom metrics library
