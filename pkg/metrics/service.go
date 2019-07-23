@@ -242,6 +242,35 @@ func createOrUpdateRoute(ctx context.Context, client client.Client, r *routev1.R
 
 }
 
+//createOrUpdateServiceMonitor is a function which creates or updates the service monitor for the servicemonitor object.
+func createOrUpdateServiceMonitor(ctx context.Context, client client.Client, sm *monitoringv1.ServiceMonitor) (*monitoringv1.ServiceMonitor, error) {
+	if err := client.Create(ctx, sm); err != nil {
+		if err != nil {
+			if !k8serr.IsAlreadyExists(err) {
+				return nil, err
+			}
+
+			existingServiceMonitor := &monitoringv1.ServiceMonitor{}
+			err := client.Get(ctx, types.NamespacedName{
+				Name:      sm.Name,
+				Namespace: sm.Namespace,
+			}, existingServiceMonitor)
+			// update the Service Monitor
+			sm.ResourceVersion = existingServiceMonitor.ResourceVersion
+			if err = client.Update(ctx, sm); err != nil {
+				log.Info("Error creating metrics route", "Error", err.Error())
+				return nil, err
+			}
+			log.Info("Metrics Route object updated ServiceMonitor.Name %v and ServiceMonitor.Namespace %v", sm.Name, sm.Namespace)
+			return existingServiceMonitor, nil
+		}
+
+	}
+	log.Info("Metrics Route object Created", "ServiceMonitor.Name", sm.Name, "ServiceMonitor.Namespace", sm.Namespace)
+	return sm, nil
+
+}
+
 func createClient() (client.Client, error) {
 	config, err := config.GetConfig()
 	if err != nil {
