@@ -30,6 +30,8 @@ func StartMetrics(config metricsConfig) {
 	http.Handle(config.metricsPath, prometheus.Handler())
 	log.Info("Port: %v", config.metricsPort)
 	metricsPort := ":" + (config.metricsPort)
+	config.withRoute := true
+	config.withServiceMonitor := true
 	go http.ListenAndServe(metricsPort, nil)
 }
 
