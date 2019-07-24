@@ -152,11 +152,14 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 	if err != nil {
 		return err
 	}
-	res := int32(p)
-	s, svcerr := GenerateService(res, "metrics")
-	if svcerr != nil {
-		log.Info("Error generating metrics service object.", "Error", svcerr.Error())
-		return svcerr
+
+	if userMetricsConfig.withServiceMonitor == true {
+		res := int32(p)
+		s, svcerr := GenerateService(res, "metrics")
+		if svcerr != nil {
+			log.Info("Error generating metrics service object.", "Error", svcerr.Error())
+			return svcerr
+		}
 	}
 	log.Info("Generated metrics service object")
 
@@ -169,7 +172,9 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 
 	log.Info("Created Service")
 	// Generate Route Object
-	r := GenerateRoute(s, userMetricsConfig.metricsPath)
+	if userMetricsConfig.withRoute == true {
+		r := GenerateRoute(s, userMetricsConfig.metricsPath)
+	}
 	log.Info("Generated metrics route object")
 
 	// Create or Update route
