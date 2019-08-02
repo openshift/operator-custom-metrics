@@ -16,6 +16,7 @@ package metrics
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
@@ -205,11 +206,11 @@ func createOrUpdateService(ctx context.Context, client client.Client, s *v1.Serv
 			log.Info("Error creating service object", "Error", err)
 			return nil, err
 		}
-		log.Info("Metrics Service object updated Service.Name %v and Service.Namespace %v", s.Name, s.Namespace)
+		log.Info(fmt.Sprintf("Metrics Service object updated Service.Name %v and Service.Namespace %v", s.Name, s.Namespace))
 		return existingService, nil
 	}
 
-	log.Info("Metrics Service object created Service.Name %v and Service.Namespace %v", s.Name, s.Namespace)
+	log.Info(fmt.Sprintf("Metrics Service object created Service.Name %v and Service.Namespace %v", s.Name, s.Namespace))
 	return s, nil
 }
 
@@ -232,7 +233,7 @@ func createOrUpdateRoute(ctx context.Context, client client.Client, r *routev1.R
 				log.Info("Error creating metrics route", "Error", err.Error())
 				return nil, err
 			}
-			log.Info("Metrics Route object updated Route.Name %v and Route.Namespace %v", r.Name, r.Namespace)
+			log.Info(fmt.Sprintf("Metrics Route object updated Route.Name %v and Route.Namespace %v", r.Name, r.Namespace))
 			return existingRoute, nil
 		}
 
