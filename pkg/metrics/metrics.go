@@ -27,8 +27,6 @@ func StartMetrics(config metricsConfig) {
 		RegisterMetrics(config.collectorList)
 	}
 
-<<<<<<< HEAD
-=======
 	// Execute recordMetricsFunction if provided by the user
 	// if config.recordMetricsFunction != nil {
 	// 	config.recordMetricsFunction()
@@ -41,7 +39,6 @@ func StartMetrics(config metricsConfig) {
 		config.withServiceMonitor = true
 	}
 	
->>>>>>> Work on PR1 review
 	http.Handle(config.metricsPath, prometheus.Handler())
 	log.Info("Port: %v", config.metricsPort)
 	metricsPort := ":" + (config.metricsPort)
