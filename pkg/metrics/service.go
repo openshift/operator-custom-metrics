@@ -153,14 +153,14 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 		return err
 	}
 
-	if userMetricsConfig.withServiceMonitor == true {
-		res := int32(p)
-		s, svcerr := GenerateService(res, "metrics")
-		if svcerr != nil {
-			log.Info("Error generating metrics service object.", "Error", svcerr.Error())
-			return svcerr
-		}
+	
+	res := int32(p)
+	s, svcerr := GenerateService(res, "metrics")
+	if svcerr != nil {
+		log.Info("Error generating metrics service object.", "Error", svcerr.Error())
+		return svcerr
 	}
+
 	log.Info("Generated metrics service object")
 
 	// Create or update Service
@@ -172,17 +172,31 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 
 	log.Info("Created Service")
 	// Generate Route Object
-	if userMetricsConfig.withRoute == true {
+	if userMetricsConfig.withRoute {
 		r := GenerateRoute(s, userMetricsConfig.metricsPath)
 	}
 	log.Info("Generated metrics route object")
-
+	
 	// Create or Update route
 	_, err = createOrUpdateRoute(ctx, client, r)
 	if err != nil {
 		log.Info("Error creating route", "Error", err.Error())
 		return err
 	}
+
+	//Generate Service Monitor Object
+	if userMetricsConfig.withServiceMonitor {
+		r := GenerateServiceMonitor(s, userMetricsConfig.metricsPath)
+	}
+	log.Info("Generated metrics service monitor object")
+
+	// Create or Update Service Monitor
+	_, err = createOrUpdateServiceMonitor(ctx, client, sm)
+	if err != nil {
+		log.Info("Error creating Service Monitor", "Error", err.Error())
+		return err
+	}
+
 	return nil
 }
 
