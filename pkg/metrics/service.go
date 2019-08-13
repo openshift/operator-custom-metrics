@@ -21,7 +21,7 @@ import (
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	routev1 "github.com/openshift/api/route/v1"
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	k8serr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -152,6 +152,7 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 	if err != nil {
 		return err
 	}
+
 	res := int32(p)
 	s, svcerr := GenerateService(res, "metrics")
 	if svcerr != nil {
@@ -166,18 +167,34 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 		log.Info("Error getting current metrics service", "Error", err.Error())
 		return err
 	}
-
 	log.Info("Created Service")
-	// Generate Route Object
-	r := GenerateRoute(s, userMetricsConfig.metricsPath)
-	log.Info("Generated metrics route object")
 
-	// Create or Update route
-	_, err = createOrUpdateRoute(ctx, client, r)
-	if err != nil {
-		log.Info("Error creating route", "Error", err.Error())
-		return err
+	// Generate Route Object
+	if userMetricsConfig.withRoute {
+		r := GenerateRoute(s, userMetricsConfig.metricsPath)
+		log.Info("Generated metrics route object")
+
+		// Create or Update route
+		_, err = createOrUpdateRoute(ctx, client, r)
+		if err != nil {
+			log.Info("Error creating route", "Error", err.Error())
+			return err
+		}
 	}
+
+	//Generate Service Monitor Object
+	if userMetricsConfig.withServiceMonitor {
+		sm := GenerateServiceMonitor(s)
+		log.Info("Generated metrics service monitor object")
+
+		// Create or Update Service Monitor
+		_, err = createOrUpdateServiceMonitor(ctx, client, sm)
+		if err != nil {
+			log.Info("Error creating Service Monitor", "Error", err.Error())
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -239,6 +256,35 @@ func createOrUpdateRoute(ctx context.Context, client client.Client, r *routev1.R
 	}
 	log.Info("Metrics Route object Created", "Route.Name", r.Name, "Route.Namespace", r.Namespace)
 	return r, nil
+
+}
+
+//createOrUpdateServiceMonitor is a function which creates or updates the service monitor for the servicemonitor object.
+func createOrUpdateServiceMonitor(ctx context.Context, client client.Client, sm *monitoringv1.ServiceMonitor) (*monitoringv1.ServiceMonitor, error) {
+	if err := client.Create(ctx, sm); err != nil {
+		if err != nil {
+			if !k8serr.IsAlreadyExists(err) {
+				return nil, err
+			}
+
+			existingServiceMonitor := &monitoringv1.ServiceMonitor{}
+			err := client.Get(ctx, types.NamespacedName{
+				Name:      sm.Name,
+				Namespace: sm.Namespace,
+			}, existingServiceMonitor)
+			// update the Service Monitor
+			sm.ResourceVersion = existingServiceMonitor.ResourceVersion
+			if err = client.Update(ctx, sm); err != nil {
+				log.Info("Error creating metrics route", "Error", err.Error())
+				return nil, err
+			}
+			log.Info("Metrics Service Monitor object updated ServiceMonitor.Name %v and ServiceMonitor.Namespace %v", sm.Name, sm.Namespace)
+			return existingServiceMonitor, nil
+		}
+
+	}
+	log.Info("Metrics Service Monitor object Created", "ServiceMonitor.Name", sm.Name, "ServiceMonitor.Namespace", sm.Namespace)
+	return sm, nil
 
 }
 
