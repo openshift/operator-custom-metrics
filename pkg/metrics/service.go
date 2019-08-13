@@ -184,7 +184,7 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 
 	//Generate Service Monitor Object
 	if userMetricsConfig.withServiceMonitor {
-		r := GenerateServiceMonitor(s, userMetricsConfig.metricsPath)
+		sm := GenerateServiceMonitor(s)
 		log.Info("Generated metrics service monitor object")
 
 		// Create or Update Service Monitor
