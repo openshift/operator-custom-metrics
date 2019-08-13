@@ -55,3 +55,13 @@ func (b *metricsConfigBuilder) WithCollectors(collectors []prometheus.Collector)
 	b.config.collectorList = collectors
 	return b
 }
+
+func (b *metricsConfigBuilder) WithRoute() *metricsConfigBuilder {
+	b.config.WithRoute = true
+	return b
+}
+
+func (b *metricsConfigBuilder) WithServiceMonitor() *metricsConfigBuilder {
+	b.config.WithServiceMonitor = true
+	return b
+}

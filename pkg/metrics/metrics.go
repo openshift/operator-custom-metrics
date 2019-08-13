@@ -27,13 +27,6 @@ func StartMetrics(config metricsConfig) {
 		RegisterMetrics(config.collectorList)
 	}
 
-	func withRoute(){
-		config.withRoute = true
-	}
-	func withServiceMonitor(){
-		config.withServiceMonitor = true
-	}
-	
 	http.Handle(config.metricsPath, prometheus.Handler())
 	log.Info("Port: %v", config.metricsPort)
 	metricsPort := ":" + (config.metricsPort)
