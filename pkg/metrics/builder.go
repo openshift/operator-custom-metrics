@@ -44,7 +44,7 @@ func (b *metricsConfigBuilder) WithPath(path string) *metricsConfigBuilder {
 }
 
 //WithName specifies the name of the service
-func (b *metricsConfigBuilder) WithName(name string) *metricsConfigBuilder {
+func (b *metricsConfigBuilder) WithServiceName(name string) *metricsConfigBuilder {
 	b.config.serviceName = name
 	return b
 }
