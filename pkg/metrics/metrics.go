@@ -15,6 +15,7 @@
 package metrics
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -28,7 +29,7 @@ func StartMetrics(config metricsConfig) {
 	}
 
 	http.Handle(config.metricsPath, prometheus.Handler())
-	log.Info("Port: %v", config.metricsPort)
+	log.Info(fmt.Sprintf("Port: %s", config.metricsPort))
 	metricsPort := ":" + (config.metricsPort)
 	go http.ListenAndServe(metricsPort, nil)
 }
