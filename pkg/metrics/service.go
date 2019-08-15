@@ -37,7 +37,7 @@ var (
 )
 
 // GenerateService returns the static service at specified port
-func GenerateService(port int32, portName string) (*v1.Service, error) {
+func GenerateService(port int32, portName string, serviceName string) (*v1.Service, error) {
 	operatorName, err := k8sutil.GetOperatorName()
 	if err != nil {
 		return nil, err
@@ -49,7 +49,7 @@ func GenerateService(port int32, portName string) (*v1.Service, error) {
 
 	service := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
-			Name:      operatorName,
+			Name:      serviceName,
 			Namespace: namespace,
 			Labels:    map[string]string{"name": operatorName},
 		},
@@ -155,7 +155,7 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 	}
 
 	res := int32(p)
-	s, svcerr := GenerateService(res, "metrics")
+	s, svcerr := GenerateService(res, "metrics", userMetricsConfig.serviceName)
 	if svcerr != nil {
 		log.Info("Error generating metrics service object.", "Error", svcerr.Error())
 		return svcerr

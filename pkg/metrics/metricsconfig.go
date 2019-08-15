@@ -6,6 +6,7 @@ import "github.com/prometheus/client_golang/prometheus"
 type metricsConfig struct {
 	metricsPath        string
 	metricsPort        string
+	serviceName        string
 	collectorList      []prometheus.Collector
 	withRoute          bool
 	withServiceMonitor bool

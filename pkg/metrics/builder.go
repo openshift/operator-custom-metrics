@@ -6,6 +6,7 @@ import "github.com/prometheus/client_golang/prometheus"
 const (
 	defaultMetricsPath = "/customMetrics"
 	defaultMetricsPort = "8089"
+	defaultServiceName = "operator-metrics"
 )
 
 // metricsConfigBuilder builds a new metricsConfig object.
@@ -19,6 +20,7 @@ func NewBuilder() *metricsConfigBuilder {
 		config: metricsConfig{
 			metricsPath:   defaultMetricsPath,
 			metricsPort:   defaultMetricsPort,
+			serviceName:   defaultServiceName,
 			collectorList: nil,
 		},
 	}
@@ -38,6 +40,12 @@ func (b *metricsConfigBuilder) WithPort(port string) *metricsConfigBuilder {
 // WithPath updates the metrics path to the value provided by the user.
 func (b *metricsConfigBuilder) WithPath(path string) *metricsConfigBuilder {
 	b.config.metricsPath = path
+	return b
+}
+
+//WithName specifies the name of the service
+func (b *metricsConfigBuilder) WithServiceName(name string) *metricsConfigBuilder {
+	b.config.serviceName = name
 	return b
 }
 
