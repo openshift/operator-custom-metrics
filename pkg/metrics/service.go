@@ -172,7 +172,7 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 
 	// Generate Route Object
 	if userMetricsConfig.withRoute {
-		r := GenerateRoute(s, userMetricsConfig.metricsPath)
+		r := GenerateRoute(s, userMetricsConfig.routePath)
 		log.Info("Generated metrics route object")
 
 		// Create or Update route

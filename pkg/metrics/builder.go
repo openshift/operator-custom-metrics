@@ -21,6 +21,7 @@ func NewBuilder() *metricsConfigBuilder {
 			metricsPath:   defaultMetricsPath,
 			metricsPort:   defaultMetricsPort,
 			serviceName:   defaultServiceName,
+			routePath:     defaultMetricsPath
 			collectorList: nil,
 		},
 	}
@@ -64,8 +65,15 @@ func (b *metricsConfigBuilder) WithCollectors(collectors []prometheus.Collector)
 	return b
 }
 
-func (b *metricsConfigBuilder) WithRoute() *metricsConfigBuilder {
+func (b *metricsConfigBuilder) WithRoute(routePath string) *metricsConfigBuilder {
 	b.config.withRoute = true
+
+	if routePath == "" {
+		b.config.routePath = routePath
+	} else {
+		b.config.routePath = b.config.metricsPath
+	}
+	
 	return b
 }
 

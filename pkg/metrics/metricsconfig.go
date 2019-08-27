@@ -7,6 +7,7 @@ type metricsConfig struct {
 	metricsPath        string
 	metricsPort        string
 	serviceName        string
+	routePath          string
 	collectorList      []prometheus.Collector
 	withRoute          bool
 	withServiceMonitor bool
