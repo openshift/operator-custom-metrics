@@ -69,9 +69,9 @@ func (b *metricsConfigBuilder) WithRoute(routePath string) *metricsConfigBuilder
 	b.config.withRoute = true
 
 	if routePath == "" {
-		b.config.routePath = routePath
-	} else {
 		b.config.routePath = b.config.metricsPath
+	} else {
+		b.config.routePath = routePath
 	}
 	
 	return b
