@@ -21,17 +21,47 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+// useTLS is a boolean value, which indicates wheather https connection
+// can be established based on the parameters provided by the user.
+var useTLS bool
+
 // StartMetrics starts the server based on the metricsConfig provided by the user.
+// If the path to TLC certificate and key are provided by the user, establish a
+// secure https connection, or else fall back to non-https
 func StartMetrics(config metricsConfig) {
 	// Register metrics only when the metric list is provided by the operator
 	if config.collectorList != nil {
 		RegisterMetrics(config.collectorList)
 	}
 
+	if config.tlsCertPath != "" && config.tlsKeyPath == "" || config.tlsCertPath == "" && config.tlsKeyPath != "" {
+		log.Info("both --tls-key and --tls-crt must be provided for TLS to be enabled, falling back to non-https")
+	} else if config.tlsCertPath == "" && config.tlsKeyPath == "" {
+		log.Info("TLS keys not set, using non-https for metrics")
+	} else {
+		log.Info("TLS keys set, using https for metrics")
+		useTLS = true
+	}
+
 	http.Handle(config.metricsPath, prometheus.Handler())
 	log.Info(fmt.Sprintf("Port: %s", config.metricsPort))
 	metricsPort := ":" + (config.metricsPort)
-	go http.ListenAndServe(metricsPort, nil)
+
+	if useTLS {
+		go func() {
+			err := http.ListenAndServeTLS(metricsPort, config.tlsCertPath, config.tlsKeyPath, nil)
+			if err != nil {
+				log.Info("Metrics (https) serving failed: %v", err)
+			}
+		}()
+	} else {
+		go func() {
+			err := http.ListenAndServe(metricsPort, nil)
+			if err != nil {
+				log.Info("Metrics (http) serving failed: %v", err)
+			}
+		}()
+	}
 }
 
 // RegisterMetrics takes the list of metrics to be registered from the user and

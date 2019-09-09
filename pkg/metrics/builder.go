@@ -7,6 +7,8 @@ const (
 	defaultMetricsPath = "/customMetrics"
 	defaultMetricsPort = "8089"
 	defaultServiceName = "operator-metrics"
+	defaulttlsCertPath = ""
+	defaulttlsKeyPath  = ""
 )
 
 // metricsConfigBuilder builds a new metricsConfig object.
@@ -22,6 +24,8 @@ func NewBuilder() *metricsConfigBuilder {
 			metricsPort:   defaultMetricsPort,
 			serviceName:   defaultServiceName,
 			collectorList: nil,
+			tlsKeyPath:    defaulttlsKeyPath,
+			tlsCertPath:   defaulttlsCertPath,
 		},
 	}
 }
@@ -71,5 +75,17 @@ func (b *metricsConfigBuilder) WithRoute() *metricsConfigBuilder {
 
 func (b *metricsConfigBuilder) WithServiceMonitor() *metricsConfigBuilder {
 	b.config.withServiceMonitor = true
+	return b
+}
+
+// WithTLSCertPath updates the TLS certificate path with the value provided by the user
+func (b *metricsConfigBuilder) WithTLSCertPath(usertlsCertPath string) *metricsConfigBuilder {
+	b.config.tlsCertPath = usertlsCertPath
+	return b
+}
+
+// WithTLSKeyPath updates the TLS key path with the value provided by the user
+func (b *metricsConfigBuilder) WithTLSKeyPath(usertlsKeyPath string) *metricsConfigBuilder {
+	b.config.tlsCertPath = usertlsKeyPath
 	return b
 }

@@ -10,4 +10,6 @@ type metricsConfig struct {
 	collectorList      []prometheus.Collector
 	withRoute          bool
 	withServiceMonitor bool
+	tlsKeyPath         string
+	tlsCertPath        string
 }
