@@ -155,7 +155,7 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 	}
 
 	res := int32(p)
-	s, svcerr := GenerateService(res, "metrics", userMetricsConfig.serviceName)
+	s, svcerr := GenerateService(res, userMetricsConfig.metricsPath, userMetricsConfig.serviceName)
 	if svcerr != nil {
 		log.Info("Error generating metrics service object.", "Error", svcerr.Error())
 		return svcerr
