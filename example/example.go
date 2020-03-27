@@ -22,6 +22,10 @@ var (
 		Name: "myapp_processed_ops_total",
 		Help: "The total number of processed events Test",
 	})
+
+	metricsList = []prometheus.Collector{
+		opsProcessed,
+	}
 )
 
 // RecordMetrics updates the values of the metrics which are to be collected.
@@ -40,8 +44,9 @@ func TestConfigMetrics() {
 	prTest := metrics.NewBuilder().
 		WithPort(metricsEndPoint).
 		WithPath(metricsPath).
-		WithCollectors(opsProcessed).
-		WithMetricsFunction(RecordMetrics).
+		WithCollectors(metricsList).
+		WithServiceName("example").
+		WithRoute().
 		GetConfig()
 
 	// Start metrics server with the exposed metrics.
