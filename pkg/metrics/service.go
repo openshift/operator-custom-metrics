@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"strconv"
+	"strings"
 
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	routev1 "github.com/openshift/api/route/v1"
@@ -38,6 +39,11 @@ var (
 
 // GenerateService returns the static service at specified port
 func GenerateService(port int32, portName string, serviceName string) (*v1.Service, error) {
+
+	// check if portname starts with "/"
+	if strings.HasPrefix(portName, "/") {
+		portName = portName[1:]
+	}
 	operatorName, err := k8sutil.GetOperatorName()
 	if err != nil {
 		return nil, err
