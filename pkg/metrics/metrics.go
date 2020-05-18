@@ -36,7 +36,7 @@ func StartMetrics(config metricsConfig) {
 }
 
 // RegisterMetrics takes the list of metrics to be registered from the user and
-// registeres to prometheus.
+// registers to prometheus.
 func RegisterMetrics(list []prometheus.Collector) error {
 	for _, metric := range list {
 		err := prometheus.Register(metric)

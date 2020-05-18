@@ -31,8 +31,8 @@ func NewBuilder() *metricsConfigBuilder {
 }
 
 // GetConfig returns the reference to the built metricsConfig.
-func (p *metricsConfigBuilder) GetConfig() *metricsConfig {
-	return &p.config
+func (b *metricsConfigBuilder) GetConfig() *metricsConfig {
+	return &b.config
 }
 
 // WithPort updates the metrics port to the value provided by the user.
