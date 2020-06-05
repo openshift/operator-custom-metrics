@@ -18,7 +18,7 @@ const (
 
 //Metric variables which are to be collected.
 var (
-	opsProcessed = prometheus.NewGauge(prometheus.GaugeOpts{
+	opsProcessed = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "myapp_processed_ops_total",
 		Help: "The total number of processed events Test",
 	})
