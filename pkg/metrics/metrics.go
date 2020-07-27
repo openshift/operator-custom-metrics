@@ -25,6 +25,7 @@ import (
 // StartMetrics starts the server based on the metricsConfig provided by the user.
 func StartMetrics(config metricsConfig) error {
 	// Register metrics only when the metric list is provided by the operator
+	fmt.Println("REGISTERING METRICS")
 	if config.collectorList != nil {
 		err := RegisterMetrics(config.collectorList)
 		if err != nil {
