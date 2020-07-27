@@ -147,7 +147,11 @@ func GenerateRoute(s *v1.Service, path string) *routev1.Route {
 func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) error {
 	log.Info("Starting prometheus metrics")
 
-	StartMetrics(userMetricsConfig)
+	err := StartMetrics(userMetricsConfig)
+	if err != nil {
+		log.Info("Failed to register metrics", "Error", err.Error())
+		return err
+	}
 
 	client, err := createClient()
 	if err != nil {

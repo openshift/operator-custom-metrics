@@ -23,16 +23,22 @@ import (
 )
 
 // StartMetrics starts the server based on the metricsConfig provided by the user.
-func StartMetrics(config metricsConfig) {
+func StartMetrics(config metricsConfig) error {
 	// Register metrics only when the metric list is provided by the operator
 	if config.collectorList != nil {
-		RegisterMetrics(config.collectorList)
+		err := RegisterMetrics(config.collectorList)
+		if err != nil {
+			log.Error(err, "Something")
+			return err
+		}
 	}
 
 	http.Handle(config.metricsPath, promhttp.Handler())
 	log.Info(fmt.Sprintf("Port: %s", config.metricsPort))
 	metricsPort := ":" + (config.metricsPort)
 	go http.ListenAndServe(metricsPort, nil)
+
+	return nil
 }
 
 // RegisterMetrics takes the list of metrics to be registered from the user and
