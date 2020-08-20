@@ -19,9 +19,10 @@ type metricsConfigBuilder struct {
 }
 
 // NewBuilder sets the default values to the metricsConfig object.
-func NewBuilder() *metricsConfigBuilder {
+func NewBuilder(namespace string) *metricsConfigBuilder {
 	return &metricsConfigBuilder{
 		config: metricsConfig{
+			namespace:     namespace,
 			metricsPath:   defaultMetricsPath,
 			metricsPort:   defaultMetricsPort,
 			serviceName:   defaultServiceName,
@@ -50,7 +51,7 @@ func (b *metricsConfigBuilder) WithPath(path string) *metricsConfigBuilder {
 	return b
 }
 
-//WithName specifies the name of the service
+// WithServiceName specifies the name of the service
 func (b *metricsConfigBuilder) WithServiceName(name string) *metricsConfigBuilder {
 	b.config.serviceName = name
 	return b
