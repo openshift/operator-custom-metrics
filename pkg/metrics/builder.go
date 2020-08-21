@@ -10,7 +10,6 @@ import (
 const (
 	defaultMetricsPath = "/customMetrics"
 	defaultMetricsPort = "8089"
-	defaultServiceName = "operator-metrics"
 )
 
 // metricsConfigBuilder builds a new metricsConfig object.
@@ -18,14 +17,14 @@ type metricsConfigBuilder struct {
 	config metricsConfig
 }
 
-// NewBuilder sets the default values to the metricsConfig object.
-func NewBuilder(namespace string) *metricsConfigBuilder {
+// NewBuilder initializes the configuration builder for a given namespace and service name
+func NewBuilder(namespace, serviceName string) *metricsConfigBuilder {
 	return &metricsConfigBuilder{
 		config: metricsConfig{
 			namespace:     namespace,
 			metricsPath:   defaultMetricsPath,
 			metricsPort:   defaultMetricsPort,
-			serviceName:   defaultServiceName,
+			serviceName:   serviceName,
 			collectorList: nil,
 		},
 	}
@@ -48,12 +47,6 @@ func (b *metricsConfigBuilder) WithPath(path string) *metricsConfigBuilder {
 		path = "/" + path
 	}
 	b.config.metricsPath = path
-	return b
-}
-
-// WithServiceName specifies the name of the service
-func (b *metricsConfigBuilder) WithServiceName(name string) *metricsConfigBuilder {
-	b.config.serviceName = name
 	return b
 }
 
