@@ -10,6 +10,9 @@ The library simplifies the following processes:
     1. Create a service resource. 
     2. Create an external [route](https://docs.openshift.com/container-platform/3.9/architecture/networking/routes.html) so that the metrics can be accessed. 
 
+The generated service is created with a label selector which targets pods with the labels `name: serviceName` where
+`serviceName` is the name of the service passed to the configuration builder during initialization.
+
 The following are the parameters of the metrics configuration (`metricsConfig`) for the custom metrics:
 
 - Metrics Path:
@@ -34,7 +37,7 @@ go get -d github.com/openshift/operator-custom-metrics
 ## Using operator-custom metrics library
 
 The following functions of the library can be called by the user to create a metrics configuration which is to be passed to the library:
-1. `NewBuilder()` - Sets the parameters of the metricsConfig Object to default values.
+1. `NewBuilder(namespace, serviceName)` - Sets the parameters of the metricsConfig Object to default values.
 2. `WithPort(port string)` - Updates the default value of port in the metricsConfig object.
 3. `WithPath(path string)` - Updates the default value of path in the metricsConfig object.
 4. `WithCollector(collector prometheus.Collector)` - Creates a list of prometheus collectors which are to be registered.

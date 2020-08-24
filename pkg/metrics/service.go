@@ -22,7 +22,6 @@ import (
 
 	monitoringv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
 	routev1 "github.com/openshift/api/route/v1"
-	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	v1 "k8s.io/api/core/v1"
 	k8serr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -30,7 +29,11 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
+	logf "sigs.k8s.io/controller-runtime/pkg/log"
+)
+
+const (
+	serviceLabelKey = "name"
 )
 
 var (
@@ -38,26 +41,18 @@ var (
 )
 
 // GenerateService returns the static service at specified port
-func GenerateService(port int32, portName string, serviceName string) (*v1.Service, error) {
+func GenerateService(port int32, portName string, serviceName, serviceNamespace string) (*v1.Service, error) {
 
 	// check if portname starts with "/"
 	if strings.HasPrefix(portName, "/") {
 		portName = portName[1:]
 	}
-	operatorName, err := k8sutil.GetOperatorName()
-	if err != nil {
-		return nil, err
-	}
-	namespace, err := k8sutil.GetOperatorNamespace()
-	if err != nil {
-		return nil, err
-	}
 
 	service := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      serviceName,
-			Namespace: namespace,
-			Labels:    map[string]string{"name": operatorName},
+			Namespace: serviceNamespace,
+			Labels:    map[string]string{serviceLabelKey: serviceName},
 		},
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -75,7 +70,7 @@ func GenerateService(port int32, portName string, serviceName string) (*v1.Servi
 					Name: portName,
 				},
 			},
-			Selector: map[string]string{"name": operatorName},
+			Selector: map[string]string{serviceLabelKey: serviceName},
 		},
 	}
 
@@ -161,7 +156,7 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 	}
 
 	res := int32(p)
-	s, svcerr := GenerateService(res, userMetricsConfig.metricsPath, userMetricsConfig.serviceName)
+	s, svcerr := GenerateService(res, userMetricsConfig.metricsPath, userMetricsConfig.serviceName, userMetricsConfig.namespace)
 	if svcerr != nil {
 		log.Info("Error generating metrics service object.", "Error", svcerr.Error())
 		return svcerr

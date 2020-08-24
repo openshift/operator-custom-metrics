@@ -10,4 +10,5 @@ type metricsConfig struct {
 	collectorList      []prometheus.Collector
 	withRoute          bool
 	withServiceMonitor bool
+	namespace          string
 }

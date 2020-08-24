@@ -40,12 +40,10 @@ func RecordMetrics() {
 
 //TestConfigMetrics creates a metricsConfig object and passes its reference to the library.
 func TestConfigMetrics() {
-
-	prTest := metrics.NewBuilder().
+	prTest := metrics.NewBuilder("test-namespace", "example-metrics-service").
 		WithPort(metricsEndPoint).
 		WithPath(metricsPath).
 		WithCollectors(metricsList).
-		WithServiceName("example").
 		WithRoute().
 		GetConfig()
 
