@@ -10,13 +10,13 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-//Metrics endpoint and path which is to be used to expose metrics.
+// Metrics endpoint and path which is to be used to expose metrics.
 const (
 	metricsEndPoint = "8080"
 	metricsPath     = "/metrics"
 )
 
-//Metric variables which are to be collected.
+// Metric variables which are to be collected.
 var (
 	opsProcessed = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "myapp_processed_ops_total",
@@ -38,13 +38,15 @@ func RecordMetrics() {
 	}()
 }
 
-//TestConfigMetrics creates a metricsConfig object and passes its reference to the library.
+// TestConfigMetrics creates a metricsConfig object and passes its reference to the library.
 func TestConfigMetrics() {
+	registry := prometheus.NewRegistry()
 	prTest := metrics.NewBuilder("test-namespace", "example-metrics-service").
 		WithPort(metricsEndPoint).
 		WithPath(metricsPath).
 		WithCollectors(metricsList).
 		WithRoute().
+		WithRegistry(registry).
 		GetConfig()
 
 	// Start metrics server with the exposed metrics.

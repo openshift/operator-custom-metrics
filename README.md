@@ -27,6 +27,9 @@ The user can provide the collectors which are to be registered with prometheus. 
 - Record metrics function:
 This is a user-defined function which describes the process in which the custom metrics are to be collected. This can be passed to the library or can be executed within the operator code based on the desired implementation.
 
+- Metrics Registry
+By default the libary uses the default Prometheus metrics registry to store metrics. This can be customized to use a specific metrics registry.
+
 ## Prerequisites
 The library can be integrated by downloading the same, using the following command:
 
@@ -42,4 +45,5 @@ The following functions of the library can be called by the user to create a met
 3. `WithPath(path string)` - Updates the default value of path in the metricsConfig object.
 4. `WithCollector(collector prometheus.Collector)` - Creates a list of prometheus collectors which are to be registered.
 5. `WithCollectors([]prometheus.Collector)` - Updates the list of collectors in the metricsConfig object.
-6. `GetConfig()` - Returns the reference to metricsConfig which is built with the configuration set by the user.
+6. `WithRegistry(registry *prometheus.Registry)` - Specify a registry to store collected metrics.
+7. `GetConfig()` - Returns the reference to metricsConfig which is built with the configuration set by the user.

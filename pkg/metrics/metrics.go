@@ -23,23 +23,30 @@ import (
 )
 
 // StartMetrics starts the server based on the metricsConfig provided by the user.
-func StartMetrics(config metricsConfig) {
-	// Register metrics only when the metric list is provided by the operator
-	if config.collectorList != nil {
-		RegisterMetrics(config.collectorList)
+func StartMetrics(config metricsConfig) error {
+	if config.metricsRegisterer == nil {
+		config.metricsRegisterer = prometheus.DefaultRegisterer
+		config.metricsGatherer = prometheus.DefaultGatherer
 	}
-
-	http.Handle(config.metricsPath, promhttp.Handler())
+	err := RegisterMetrics(config.metricsRegisterer, config.collectorList)
+	if err != nil {
+		return err
+	}
+	metricsHandler := promhttp.InstrumentMetricHandler(
+		config.metricsRegisterer, promhttp.HandlerFor(config.metricsGatherer, promhttp.HandlerOpts{}),
+	)
+	http.Handle(config.metricsPath, metricsHandler)
 	log.Info(fmt.Sprintf("Port: %s", config.metricsPort))
 	metricsPort := ":" + (config.metricsPort)
 	go http.ListenAndServe(metricsPort, nil)
+	return nil
 }
 
 // RegisterMetrics takes the list of metrics to be registered from the user and
 // registers to prometheus.
-func RegisterMetrics(list []prometheus.Collector) error {
+func RegisterMetrics(metricsRegisterer prometheus.Registerer, list []prometheus.Collector) error {
 	for _, metric := range list {
-		err := prometheus.Register(metric)
+		err := metricsRegisterer.Register(metric)
 		if err != nil {
 			return err
 		}

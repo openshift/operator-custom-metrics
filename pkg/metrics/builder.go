@@ -65,6 +65,13 @@ func (b *metricsConfigBuilder) WithCollectors(collectors []prometheus.Collector)
 	return b
 }
 
+// WithRegistry allows specifying the prometheus registry to use for metrics. Other the default prometheus registry is used.
+func (b *metricsConfigBuilder) WithRegistry(registry *prometheus.Registry) *metricsConfigBuilder {
+	b.config.metricsRegisterer = registry
+	b.config.metricsGatherer = registry
+	return b
+}
+
 func (b *metricsConfigBuilder) WithRoute() *metricsConfigBuilder {
 	b.config.withRoute = true
 	return b
