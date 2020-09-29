@@ -38,7 +38,23 @@ func StartMetrics(config metricsConfig) error {
 	http.Handle(config.metricsPath, metricsHandler)
 	log.Info(fmt.Sprintf("Port: %s", config.metricsPort))
 	metricsPort := ":" + (config.metricsPort)
-	go http.ListenAndServe(metricsPort, nil)
+
+	errc := make(chan error)
+	go ListenAndServeHandle(metricsPort, errc)
+	errMsg := <-errc
+	if errMsg != nil {
+		return errMsg
+	}
+	return nil
+}
+
+// ListenAndServeHandle takes in metricsPort and a channel for error
+func ListenAndServeHandle(metricsPort string, errc chan error) error {
+	err := http.ListenAndServe(metricsPort, nil)
+	if err != nil {
+		errc <- err
+		return err
+	}
 	return nil
 }
 
