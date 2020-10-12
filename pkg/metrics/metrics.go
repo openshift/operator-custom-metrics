@@ -36,13 +36,16 @@ func StartMetrics(config metricsConfig) error {
 	metricsHandler := promhttp.InstrumentMetricHandler(
 		config.metricsRegisterer, promhttp.HandlerFor(config.metricsGatherer, promhttp.HandlerOpts{}),
 	)
-	http.Handle(config.metricsPath, metricsHandler)
 	log.Info(fmt.Sprintf("Port: %s", config.metricsPort))
-	metricsPort := ":" + (config.metricsPort)
-	if free := isPortFree(metricsPort); !free{
+	metricsPort := fmt.Sprintf(":%s", config.metricsPort)
+	if free := isPortFree(metricsPort); !free {
 		return fmt.Errorf("port %s is not free", config.metricsPort)
 	}
-	go http.ListenAndServe(metricsPort, nil)
+	server := &http.Server{
+		Addr:    metricsPort,
+		Handler: metricsHandler,
+	}
+	go server.ListenAndServe()
 	return nil
 }
 
