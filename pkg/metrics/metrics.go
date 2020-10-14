@@ -16,6 +16,7 @@ package metrics
 
 import (
 	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -35,27 +36,26 @@ func StartMetrics(config metricsConfig) error {
 	metricsHandler := promhttp.InstrumentMetricHandler(
 		config.metricsRegisterer, promhttp.HandlerFor(config.metricsGatherer, promhttp.HandlerOpts{}),
 	)
-	http.Handle(config.metricsPath, metricsHandler)
 	log.Info(fmt.Sprintf("Port: %s", config.metricsPort))
-	metricsPort := ":" + (config.metricsPort)
-
-	errc := make(chan error)
-	go ListenAndServeHandle(metricsPort, errc)
-	errMsg := <-errc
-	if errMsg != nil {
-		return errMsg
+	metricsPort := fmt.Sprintf(":%s", config.metricsPort)
+	if free := isPortFree(metricsPort); !free {
+		return fmt.Errorf("port %s is not free", config.metricsPort)
 	}
+	server := &http.Server{
+		Addr:    metricsPort,
+		Handler: metricsHandler,
+	}
+	go server.ListenAndServe()
 	return nil
 }
 
-// ListenAndServeHandle takes in metricsPort and a channel for error
-func ListenAndServeHandle(metricsPort string, errc chan error) error {
-	err := http.ListenAndServe(metricsPort, nil)
+func isPortFree(port string) bool {
+	listener, err := net.Listen("tcp", port)
 	if err != nil {
-		errc <- err
-		return err
+		return false
 	}
-	return nil
+	listener.Close()
+	return true
 }
 
 // RegisterMetrics takes the list of metrics to be registered from the user and
