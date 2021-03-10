@@ -8,7 +8,7 @@ import (
 
 // Default variables for metrics-path and metrics-port.
 const (
-	defaultMetricsPath = "/customMetrics"
+	defaultMetricsPath = "/custommetrics"
 	defaultMetricsPort = "8089"
 )
 
