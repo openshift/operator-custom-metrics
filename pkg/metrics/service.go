@@ -258,7 +258,7 @@ func createOrUpdateRoute(ctx context.Context, client client.Client, r *routev1.R
 				log.Info("Error creating metrics route", "Error", err.Error())
 				return nil, err
 			}
-			log.Info(fmt.Sprintf("Metrics Route object updated Route.Name %v and Route.Namespace %v", r.Name, r.Namespace))
+			log.Info(fmt.Sprintf("Metrics Route object updated Route.Name %s and Route.Namespace %s", r.Name, r.Namespace))
 			return existingRoute, nil
 		}
 
@@ -286,7 +286,7 @@ func createOrUpdateServiceMonitor(ctx context.Context, client client.Client, sm 
 			log.Info("Error creating metrics route", "Error", err.Error())
 			return nil, err
 		}
-		log.Info("Metrics Service Monitor object updated ServiceMonitor.Name %v and ServiceMonitor.Namespace %v", sm.Name, sm.Namespace)
+		log.Info(fmt.Sprintf("Metrics Service Monitor object updated ServiceMonitor.Name %s and ServiceMonitor.Namespace %s", sm.Name, sm.Namespace))
 		return existingServiceMonitor, nil
 	}
 
