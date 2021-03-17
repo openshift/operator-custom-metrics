@@ -41,18 +41,24 @@ var (
 )
 
 // GenerateService returns the static service at specified port
-func GenerateService(port int32, portName string, serviceName, serviceNamespace string) (*v1.Service, error) {
+func GenerateService(port int32, portName string, serviceName, serviceNamespace string, serviceLabel map[string]string) (*v1.Service, error) {
 
 	// check if portname starts with "/"
 	if strings.HasPrefix(portName, "/") {
 		portName = portName[1:]
 	}
 
+	serviceLabelSelector := map[string]string{serviceLabelKey: serviceName}
+
+	if len(serviceLabel) > 0 {
+		serviceLabelSelector = serviceLabel
+	}
+
 	service := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      serviceName,
 			Namespace: serviceNamespace,
-			Labels:    map[string]string{serviceLabelKey: serviceName},
+			Labels:    serviceLabelSelector,
 		},
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Service",
@@ -70,7 +76,7 @@ func GenerateService(port int32, portName string, serviceName, serviceNamespace 
 					Name: portName,
 				},
 			},
-			Selector: map[string]string{serviceLabelKey: serviceName},
+			Selector: serviceLabelSelector,
 		},
 	}
 
@@ -160,7 +166,7 @@ func ConfigureMetrics(ctx context.Context, userMetricsConfig metricsConfig) erro
 	}
 
 	res := int32(p)
-	s, svcerr := GenerateService(res, userMetricsConfig.metricsPath, userMetricsConfig.serviceName, userMetricsConfig.namespace)
+	s, svcerr := GenerateService(res, userMetricsConfig.metricsPath, userMetricsConfig.serviceName, userMetricsConfig.namespace, userMetricsConfig.serviceLabel)
 	if svcerr != nil {
 		log.Info("Error generating metrics service object.", "Error", svcerr.Error())
 		return svcerr
@@ -252,7 +258,7 @@ func createOrUpdateRoute(ctx context.Context, client client.Client, r *routev1.R
 				log.Info("Error creating metrics route", "Error", err.Error())
 				return nil, err
 			}
-			log.Info(fmt.Sprintf("Metrics Route object updated Route.Name %v and Route.Namespace %v", r.Name, r.Namespace))
+			log.Info(fmt.Sprintf("Metrics Route object updated Route.Name %s and Route.Namespace %s", r.Name, r.Namespace))
 			return existingRoute, nil
 		}
 
@@ -280,7 +286,7 @@ func createOrUpdateServiceMonitor(ctx context.Context, client client.Client, sm 
 			log.Info("Error creating metrics route", "Error", err.Error())
 			return nil, err
 		}
-		log.Info("Metrics Service Monitor object updated ServiceMonitor.Name %v and ServiceMonitor.Namespace %v", sm.Name, sm.Namespace)
+		log.Info(fmt.Sprintf("Metrics Service Monitor object updated ServiceMonitor.Name %s and ServiceMonitor.Namespace %s", sm.Name, sm.Namespace))
 		return existingServiceMonitor, nil
 	}
 

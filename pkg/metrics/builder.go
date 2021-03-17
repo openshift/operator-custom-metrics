@@ -41,6 +41,12 @@ func (b *metricsConfigBuilder) WithPort(port string) *metricsConfigBuilder {
 	return b
 }
 
+// WithPort updates the metrics port to the value provided by the user.
+func (b *metricsConfigBuilder) WithServiceLabel(label map[string]string) *metricsConfigBuilder {
+	b.config.serviceLabel = label
+	return b
+}
+
 // WithPath updates the metrics path to the value provided by the user.
 func (b *metricsConfigBuilder) WithPath(path string) *metricsConfigBuilder {
 	if !strings.HasPrefix(path, "/") {

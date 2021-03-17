@@ -9,6 +9,7 @@ type metricsConfig struct {
 	metricsRegisterer  prometheus.Registerer
 	metricsGatherer    prometheus.Gatherer
 	serviceName        string
+	serviceLabel       map[string]string
 	collectorList      []prometheus.Collector
 	withRoute          bool
 	withServiceMonitor bool
