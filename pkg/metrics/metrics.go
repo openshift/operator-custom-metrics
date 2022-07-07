@@ -45,7 +45,7 @@ func StartMetrics(config metricsConfig) error {
 		Addr:    metricsPort,
 		Handler: metricsHandler,
 	}
-	go server.ListenAndServe()
+	go server.ListenAndServe() // nolint:errcheck
 	return nil
 }
 

@@ -44,9 +44,7 @@ var (
 func GenerateService(port int32, portName string, serviceName, serviceNamespace string, serviceLabel map[string]string) (*v1.Service, error) {
 
 	// check if portname starts with "/"
-	if strings.HasPrefix(portName, "/") {
-		portName = portName[1:]
-	}
+	portName = strings.TrimPrefix(portName, "/")
 
 	serviceLabelSelector := map[string]string{serviceLabelKey: serviceName}
 
@@ -222,6 +220,11 @@ func createOrUpdateService(ctx context.Context, client client.Client, s *v1.Serv
 			Namespace: s.Namespace,
 		}, existingService)
 
+		if err != nil {
+			log.Info("Error retrieving service object", "Error", err)
+			return nil, err
+		}
+
 		s.ResourceVersion = existingService.ResourceVersion
 		if existingService.Spec.Type == v1.ServiceTypeClusterIP {
 			s.Spec.ClusterIP = existingService.Spec.ClusterIP
@@ -252,6 +255,12 @@ func createOrUpdateRoute(ctx context.Context, client client.Client, r *routev1.R
 				Name:      r.Name,
 				Namespace: r.Namespace,
 			}, existingRoute)
+
+			if err != nil {
+				log.Info("Error retrieving service object", "Error", err)
+				return nil, err
+			}
+
 			// update the Route
 			r.ResourceVersion = existingRoute.ResourceVersion
 			if err = client.Update(ctx, r); err != nil {
@@ -280,6 +289,12 @@ func createOrUpdateServiceMonitor(ctx context.Context, client client.Client, sm 
 			Name:      sm.Name,
 			Namespace: sm.Namespace,
 		}, existingServiceMonitor)
+
+		if err != nil {
+			log.Info("Error retrieving service object", "Error", err)
+			return nil, err
+		}
+		
 		// update the Service Monitor
 		sm.ResourceVersion = existingServiceMonitor.ResourceVersion
 		if err = client.Update(ctx, sm); err != nil {
