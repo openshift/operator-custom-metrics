@@ -3,7 +3,7 @@ module github.com/openshift/operator-custom-metrics
 go 1.17
 
 require (
-	github.com/openshift/api v3.9.0+incompatible
+	github.com/openshift/api v0.0.0-20220414050251-a83e6f8f1d50
 	github.com/prometheus-operator/prometheus-operator/pkg/apis/monitoring v0.55.0
 	github.com/prometheus/client_golang v1.12.1
 	github.com/sirupsen/logrus v1.8.1
