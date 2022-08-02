@@ -54,11 +54,12 @@ func TestCheckOpenTCPPortFree(t *testing.T) {
 }
 
 func getMetricsResponse(metricsAddr string) (int, error) {
+	//#nosec G107 : the variable part of the URL is the port which is provided by Kernel at runtime for the test so cannot be const
 	resp, err := http.Get(metricsAddr)
-	defer resp.Body.Close()
 	if err != nil {
 		return -1, err
 	}
+	defer resp.Body.Close()
 	return resp.StatusCode, nil
 }
 
