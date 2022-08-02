@@ -27,6 +27,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -301,7 +302,12 @@ func createClient() (client.Client, error) {
 		return nil, err
 	}
 
-	client, err := client.New(config, client.Options{})
+	err = monitoringv1.AddToScheme(scheme.Scheme)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := client.New(config, client.Options{Scheme: scheme.Scheme})
 	if err != nil {
 		return nil, err
 	}
