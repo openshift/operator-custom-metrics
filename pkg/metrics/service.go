@@ -25,9 +25,9 @@ import (
 	v1 "k8s.io/api/core/v1"
 	k8serr "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/client-go/kubernetes/scheme"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -295,7 +295,7 @@ func createOrUpdateServiceMonitor(ctx context.Context, client client.Client, sm 
 			log.Info("Error retrieving service object", "Error", err)
 			return nil, err
 		}
-		
+
 		// update the Service Monitor
 		sm.ResourceVersion = existingServiceMonitor.ResourceVersion
 		if err = client.Update(ctx, sm); err != nil {
@@ -317,12 +317,18 @@ func createClient() (client.Client, error) {
 		return nil, err
 	}
 
-	err = monitoringv1.AddToScheme(scheme.Scheme)
+	scheme := runtime.NewScheme()
+	err = monitoringv1.AddToScheme(scheme)
 	if err != nil {
 		return nil, err
 	}
 
-	client, err := client.New(config, client.Options{Scheme: scheme.Scheme})
+	err = routev1.Install(scheme)
+	if err != nil {
+		return nil, err
+	}
+
+	client, err := client.New(config, client.Options{Scheme: scheme})
 	if err != nil {
 		return nil, err
 	}
